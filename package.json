@@ -1,0 +1,28 @@
+{
+  "name": "flow-lock",
+  "version": "1.0.0",
+  "description": "心流强制锁定器 - 强制锁定指定应用，屏蔽一切干扰，进入深度专注状态",
+  "author": "Rei-Lla",
+  "license": "MIT",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5174 && tsc -p tsconfig.electron.json && electron .\"",
+    "build": "vite build && tsc -p tsconfig.electron.json",
+    "package": "npm run build && electron-builder --mac --universal"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^9.1.2",
+    "electron": "^35.1.2",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.2",
+    "wait-on": "^8.0.3"
+  }
+}
