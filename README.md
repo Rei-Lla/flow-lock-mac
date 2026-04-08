@@ -1,10 +1,12 @@
-# 心流强制锁定器 - Mac 版本
+# 心流强制锁定器
 
 > 强制锁定指定应用，屏蔽一切干扰，进入深度专注的心流状态。
 
+**支持 macOS 和 Windows** | [Mac 版本](#mac-版本) | [Windows 版本](#windows-版本)
+
 你是否也有这样的经历：打算专注写代码，却不自觉打开了微信；准备读论文，手指却滑向了浏览器？
 
-**心流强制锁定器**是一款 macOS 桌面应用，它会在你设定的时间内，**强制你只能使用选定的应用**。所有其他应用——无论是从 Dock 点击、Cmd+Tab 切换、还是 Spotlight 打开——都会被瞬间隐藏。直到倒计时结束，你才能重获自由。
+**心流强制锁定器**是一款桌面应用，它会在你设定的时间内，**强制你只能使用选定的应用**。所有其他应用——无论是从 Dock/任务栏点击、Cmd+Tab/Alt+Tab 切换、还是搜索打开——都会被瞬间隐藏。直到倒计时结束，你才能重获自由。
 
 没有"再看一眼就好"，没有"就回一条消息"。**物理级别的干扰屏蔽。**
 
@@ -68,41 +70,62 @@
 
 ---
 
-## 安装
+## Mac 版本
 
-### 方式一：下载 DMG（推荐）
+### 安装
+
+**方式一：下载 DMG（推荐）**
 
 前往 [Releases](../../releases) 页面，下载最新的 `.dmg` 文件，拖入 Applications 即可。
 
-### 方式二：从源码构建
+**方式二：从源码构建**
 
 ```bash
-# 克隆仓库
 git clone https://github.com/Rei-Lla/flow-lock-mac.git
 cd flow-lock-mac
-
-# 安装依赖
 npm install
-
-# 开发模式运行
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 打包为 DMG
-npm run package
+npm run dev        # 开发模式
+npm run package    # 打包为 DMG
 ```
+
+### 权限设置
+
+首次启动时，macOS 会请求 **自动化权限**（Automation）。如果应用列表为空，请前往：
+
+> **系统设置 → 隐私与安全性 → 自动化** → 为「心流锁定器」开启 **System Events** 权限
+
+### 技术实现
+
+通过 **AppleScript** 调用 System Events 检测前台应用进程，发现非白名单应用时执行 `set visible to false` 隐藏并切回锁定应用。
 
 ---
 
-## 权限设置
+## Windows 版本
 
-首次启动时，macOS 会请求 **自动化权限**（Automation），用于检测和管理运行中的应用。
+### 安装
 
-如果应用列表为空，请前往：
+**方式一：下载安装包（推荐）**
 
-> **系统设置 → 隐私与安全性 → 自动化** → 为「心流锁定器」开启 **System Events** 权限
+前往 [Releases](../../releases) 页面，下载 `.exe` 安装包或便携版。
+
+**方式二：从源码构建**
+
+```bash
+git clone https://github.com/Rei-Lla/flow-lock-mac.git
+cd flow-lock-mac/pc-version
+npm install
+npm run dev        # 开发模式
+npm run package    # 打包为 EXE
+```
+
+### 系统要求
+
+- Windows 10 及以上
+- PowerShell 5.1（系统自带，无需额外安装）
+
+### 技术实现
+
+启动时创建一个 **持久 PowerShell 进程**，编译 C# 互操作代码调用 Win32 API（`GetForegroundWindow`、`ShowWindow`、`SetForegroundWindow`），实现高效的前台窗口检测与隐藏。无需额外权限。
 
 ---
 
@@ -111,7 +134,7 @@ npm run package
 - **Electron** — 跨平台桌面框架
 - **React + TypeScript** — 前端界面
 - **Vite** — 构建工具
-- **AppleScript** — macOS 应用检测与焦点管理
+- **AppleScript**（Mac）/ **PowerShell + Win32 API**（Windows）— 应用检测与焦点管理
 
 ---
 
@@ -129,12 +152,12 @@ npm run package
                          └── 切换焦点到锁定应用
 ```
 
-核心机制非常简单：通过 AppleScript 高频检测 macOS 的前台应用进程，一旦发现不在白名单中的应用出现，立即将其设为不可见（`set visible to false`）并激活允许的应用。
+核心机制非常简单：高频检测前台应用进程，一旦发现不在白名单中的应用出现，立即将其隐藏并激活允许的应用。
 
 这意味着：
-- 从 Dock 点击非锁定应用 → 闪一下就消失
-- Cmd+Tab 切到非锁定应用 → 瞬间被拉回
-- Spotlight 打开新应用 → 立即被隐藏
+- 从 Dock / 任务栏点击非锁定应用 → 闪一下就消失
+- Cmd+Tab / Alt+Tab 切到非锁定应用 → 瞬间被拉回
+- Spotlight / 搜索打开新应用 → 立即被隐藏
 - **无法绕过，除非使用紧急解锁**
 
 ---
@@ -150,9 +173,9 @@ npm run package
 
 ## 已知限制
 
-- 仅支持 macOS（依赖 AppleScript 的 System Events）
-- 需要授予自动化权限
-- 无法阻止通过 Terminal 手动 kill 进程（但如果你都到 Terminal 操作了，说明你是认真的）
+- Mac 版需要授予自动化权限（首次启动会提示）
+- Windows 版需要 PowerShell 5.1（Win10+ 自带）
+- 无法阻止通过 Terminal/CMD 手动 kill 进程（但如果你都到命令行操作了，说明你是认真的）
 
 ---
 
